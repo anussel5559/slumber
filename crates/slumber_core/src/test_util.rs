@@ -121,8 +121,11 @@ impl Prompter for TestPrompter {
         }
     }
 
-    fn select(&self, _select: Select) {
-        unimplemented!("TestPrompter does not yet support select prompts")
+    fn select(&self, select: Select) {
+        let index = self.index.fetch_add(1, Ordering::Relaxed);
+        if let Some(value) = self.responses.get(index) {
+            select.channel.respond(value.clone())
+        }
     }
 }
 
