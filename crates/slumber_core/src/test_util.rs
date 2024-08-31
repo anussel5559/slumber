@@ -3,7 +3,7 @@
 use crate::{
     collection::{ChainSource, HasId},
     http::HttpEngine,
-    template::{Prompt, Prompter},
+    template::{Prompt, Prompter, Select},
     util::{get_repo_root, ResultTraced},
 };
 use anyhow::Context;
@@ -116,6 +116,9 @@ impl Prompter for TestPrompter {
         } else if let Some(default) = prompt.default {
             prompt.channel.respond(default);
         }
+    }
+    fn select(&self, _select: Select) {
+        unimplemented!("TestPrompter does not yet support select prompts")
     }
 }
 

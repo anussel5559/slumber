@@ -4,7 +4,9 @@ pub mod highlight;
 pub mod persistence;
 
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use slumber_core::template::{Prompt, PromptChannel, Prompter};
+use slumber_core::template::{
+    Prompt, PromptChannel, Prompter, Select, SelectResult,
+};
 
 /// A data structure for representation a yes/no confirmation. This is similar
 /// to [Prompt], but it only asks a yes/no question.
@@ -24,6 +26,11 @@ pub struct PreviewPrompter;
 impl Prompter for PreviewPrompter {
     fn prompt(&self, prompt: Prompt) {
         prompt.channel.respond("<prompt>".into())
+    }
+    fn select(&self, select: Select) {
+        select
+            .channel
+            .respond(SelectResult::Placeholder("<select>".into()))
     }
 }
 
