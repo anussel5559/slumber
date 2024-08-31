@@ -19,6 +19,7 @@ pub trait Prompter: Debug + Send + Sync {
     /// If an error occurs while prompting the user, just drop the returner.
     /// The implementor is responsible for logging the error as appropriate.
     fn prompt(&self, prompt: Prompt);
+
     /// Ask the user to pick an item for a list of choices
     fn select(&self, select: Select);
 }
@@ -35,17 +36,8 @@ pub struct Prompt {
     /// How the prompter will pass the answer back
     pub channel: PromptChannel<String>,
 }
-/// When the app goes to collect user input on a select list
-/// the expected result is the chosen index from the options vector
-/// HOWEVER, that makes it very tough to render a preview in the TUI
-/// So, we use the below enum to signal that the result of the selection could
-/// be either
-#[derive(Debug)]
-pub enum SelectResult {
-    Placeholder(String),
-    Index(usize),
-}
 
+/// A list of options to present to the user
 #[derive(Debug)]
 pub struct Select {
     /// Tell the user what we're asking for
@@ -53,7 +45,7 @@ pub struct Select {
     /// List of choices the user can pick from
     pub options: Vec<String>,
     /// How the prompter will pass the answer back
-    pub channel: PromptChannel<SelectResult>,
+    pub channel: PromptChannel<String>,
 }
 
 /// Channel used to return a prompt response. This is its own type so we can

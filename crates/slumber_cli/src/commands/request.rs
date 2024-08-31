@@ -226,6 +226,7 @@ impl Prompter for CliPrompter {
             prompt.channel.respond(value);
         }
     }
+
     fn select(&self, _select: Select) {
         unimplemented!("Select prompts not yet implemented");
     }

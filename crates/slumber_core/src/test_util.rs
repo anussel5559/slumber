@@ -120,6 +120,7 @@ impl Prompter for TestPrompter {
             prompt.channel.respond(default);
         }
     }
+
     fn select(&self, _select: Select) {
         unimplemented!("TestPrompter does not yet support select prompts")
     }
