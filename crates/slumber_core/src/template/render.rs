@@ -8,7 +8,7 @@ use crate::{
     http::{content_type::ContentType, Exchange, RequestSeed, ResponseRecord},
     template::{
         error::TriggeredRequestError, parse::TemplateInputChunk, ChainError,
-        Prompt, Select, SelectResult, Template, TemplateChunk, TemplateContext,
+        Prompt, Select, Template, TemplateChunk, TemplateContext,
         TemplateError, TemplateKey,
     },
     util::{expand_home, FutureCache, FutureCacheOutcome, ResultTraced},
@@ -771,14 +771,11 @@ impl<'a> ChainTemplateSource<'a> {
 
         context.prompter.select(Select {
             message,
-            options: options.clone(),
+            options,
             channel: tx.into(),
         });
-        let res = rx.await.map_err(|_| ChainError::PromptNoResponse)?;
-        match res {
-            SelectResult::Index(chosen_idx) => Ok(options[chosen_idx].clone()),
-            SelectResult::Placeholder(placeholder) => Ok(placeholder),
-        }
+
+        rx.await.map_err(|_| ChainError::PromptNoResponse)
     }
 }
 

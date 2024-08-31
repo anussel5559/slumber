@@ -7,7 +7,7 @@ mod prompt;
 mod render;
 
 pub use error::{ChainError, TemplateError, TriggeredRequestError};
-pub use prompt::{Prompt, PromptChannel, Prompter, Select, SelectResult};
+pub use prompt::{Prompt, PromptChannel, Prompter, Select};
 
 use crate::{
     collection::{ChainId, Collection, ProfileId},

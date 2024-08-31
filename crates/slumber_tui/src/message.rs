@@ -45,6 +45,7 @@ impl Prompter for MessageSender {
     fn prompt(&self, prompt: Prompt) {
         self.send(Message::PromptStart(prompt));
     }
+
     fn select(&self, _select: Select) {
         unimplemented!("Select prompts not yet implemented");
     }
