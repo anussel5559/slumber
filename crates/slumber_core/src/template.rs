@@ -942,7 +942,82 @@ mod tests {
 
         assert_err!(
             render!("{{chains.chain1}}", context),
-            "No response from prompt"
+            "No response from prompt/select"
+        );
+    }
+
+    #[rstest]
+    #[case::no_chains(vec!["foo!", "bar!"], Some("bar!"), "bar!")]
+    #[case::embedded_chain(vec!["{{chains.chain2}}", "bar!"], Some("foo!"), "foo!")]
+    #[case::all_chains(vec!["{{chains.chain2}}", "{{chains.chain3}}"], Some("baz!"), "baz!")]
+    #[tokio::test]
+    async fn test_chain_select(
+        #[case] options: Vec<&str>,
+        #[case] response: Option<&str>,
+        #[case] expected: &str,
+    ) {
+        let sut_chain = Chain {
+            id: "chain1".into(),
+            source: ChainSource::Select {
+                message: Some("password".into()),
+                options: options.into_iter().map(|s| s.into()).collect(),
+            },
+            ..Chain::factory(())
+        };
+
+        let chain2 = Chain {
+            id: "chain2".into(),
+            source: ChainSource::Environment {
+                variable: "TEST".into(),
+            },
+            ..Chain::factory(())
+        };
+
+        let chain3 = Chain {
+            id: "chain3".into(),
+            source: ChainSource::Environment {
+                variable: "TEST2".into(),
+            },
+            ..Chain::factory(())
+        };
+
+        // Test value from prompter
+        let context = TemplateContext {
+            collection: Collection {
+                chains: by_id([sut_chain, chain2, chain3]),
+                ..Collection::factory(())
+            }
+            .into(),
+
+            prompter: Box::new(TestPrompter::new(response)),
+            ..TemplateContext::factory(())
+        };
+        assert_eq!(render!("{{chains.chain1}}", context).unwrap(), expected);
+    }
+
+    #[tokio::test]
+    async fn test_chain_select_error() {
+        let chain = Chain {
+            source: ChainSource::Select {
+                message: Some("password".into()),
+                options: vec!["foo".into(), "bar".into()],
+            },
+            ..Chain::factory(())
+        };
+        let context = TemplateContext {
+            collection: Collection {
+                chains: by_id([chain]),
+                ..Collection::factory(())
+            }
+            .into(),
+            // Prompter gives no response
+            prompter: Box::<TestPrompter>::default(),
+            ..TemplateContext::factory(())
+        };
+
+        assert_err!(
+            render!("{{chains.chain1}}", context),
+            "No response from prompt/select"
         );
     }
 
