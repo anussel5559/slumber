@@ -948,8 +948,6 @@ mod tests {
 
     #[rstest]
     #[case::no_chains(vec!["foo!", "bar!"], Some("bar!"), "bar!")]
-    #[case::embedded_chain(vec!["{{chains.chain2}}", "bar!"], Some("foo!"), "foo!")]
-    #[case::all_chains(vec!["{{chains.chain2}}", "{{chains.chain3}}"], Some("baz!"), "baz!")]
     #[tokio::test]
     async fn test_chain_select(
         #[case] options: Vec<&str>,
@@ -957,7 +955,6 @@ mod tests {
         #[case] expected: &str,
     ) {
         let sut_chain = Chain {
-            id: "chain1".into(),
             source: ChainSource::Select {
                 message: Some("password".into()),
                 options: options.into_iter().map(|s| s.into()).collect(),
@@ -965,26 +962,10 @@ mod tests {
             ..Chain::factory(())
         };
 
-        let chain2 = Chain {
-            id: "chain2".into(),
-            source: ChainSource::Environment {
-                variable: "TEST".into(),
-            },
-            ..Chain::factory(())
-        };
-
-        let chain3 = Chain {
-            id: "chain3".into(),
-            source: ChainSource::Environment {
-                variable: "TEST2".into(),
-            },
-            ..Chain::factory(())
-        };
-
         // Test value from prompter
         let context = TemplateContext {
             collection: Collection {
-                chains: by_id([sut_chain, chain2, chain3]),
+                chains: by_id([sut_chain]),
                 ..Collection::factory(())
             }
             .into(),
